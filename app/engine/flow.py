@@ -30,6 +30,23 @@ _TITLE_UNIT_RE = re.compile(
 _BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[\.、)]|（\d+）|\(\d+\))\s*")
 _BAD_UNIT_RE = re.compile(r"[与及和等、,，；;]")
 
+# 同义工序名归并：去掉括号内容与“工序/岗位/区域”等后缀后的核心名相同 → 视为同一节点。
+# 例：“合成（络合沉淀）工序”与“合成岗位”、“结晶工序”与“结晶岗位”。
+_UNIT_SUFFIXES = ("作业区", "工段", "工序", "工位", "岗位", "区域", "单元", "车间", "场所")
+_BRACKET_RE = re.compile(r"[（(][^）)]*[）)]")
+# 全厂/全装置类通用单元：仍保留条目的 unit 归属，但不作为流程节点（避免出现“全装置”这种伪节点）
+GENERIC_UNITS = {"全装置", "全厂", "全公司", "通用", "其他", "其它"}
+
+
+def _unit_core(nm: str) -> str:
+    """取“核心工序名”：去掉括号内容与 工序/岗位/区域 等后缀，用于同义归并。"""
+    s = _BRACKET_RE.sub("", str(nm or ""))
+    for suf in _UNIT_SUFFIXES:
+        if s.endswith(suf) and len(s) > len(suf):
+            s = s[:-len(suf)]
+            break
+    return s.strip()
+
 
 def _clean_unit(nm) -> str:
     return re.sub(r"\s+", "", str(nm or "")).strip("*_`#-— ")
@@ -55,20 +72,34 @@ def _bad_unit(nm: str, trusted: bool = False) -> bool:
     return False
 
 
-def _unit_pos(name: str, lines: list) -> int:
-    """候选名的“定义位置”：优先“列表项/段落首且后接冒号”的行，其次标题行，最后首次出现行。"""
+def _is_def_line(text: str, names: list) -> bool:
+    """该行是否为某个候选工序名的“定义行”（行首即工序名且后接冒号/逗号/句号）。"""
+    t = _BULLET_RE.sub("", text)
+    return any(t.startswith(o) and t[len(o):len(o) + 1] in ("：", ":", "，", ",", "。")
+               for o in names if o and len(o) >= 2)
+
+
+def _unit_pos(name: str, lines: list, names: list | None = None) -> int:
+    """候选名的“定义位置”：优先“列表项/段落首且后接冒号”的行，其次标题行，最后首次出现行。
+
+    注意：形如“定员：合成岗位 ≤2 人；干燥筛分岗位 ≤1 人；装盒岗位…”的**并列叙述行**会把工序名
+    误拉到文档很前面，导致流程图顺序错乱；此类“非定义行且并列提及≥2 个候选名”的行不计入位置。
+    """
+    pool = [n for n in (names or [name]) if n and len(n) >= 2]
     first = None
     for i, ln in enumerate(lines):
         s = ln.strip()
         if not s or name not in s:
             continue
-        if first is None:
-            first = i
         s2 = _BULLET_RE.sub("", s)
         if s2.startswith(name) and s2[len(name):len(name) + 1] in ("：", ":", "，", ",", "。"):
             return i
         if s.startswith("#"):
             return i
+        if not _is_def_line(s, pool) and sum(1 for o in pool if o in s) >= 2:
+            continue          # 并列叙述行（定员/装置一览等），不作为工序定义位置
+        if first is None:
+            first = i
     return first if first is not None else 10 ** 6
 
 
@@ -134,6 +165,8 @@ def build_process_flow(text: str, items: list, scene_units: list | None = None) 
 
     def add(nm, trust=False):
         nm = _clean_unit(nm)
+        if nm in GENERIC_UNITS:          # 全厂/全装置类通用名不进流程节点
+            return
         if nm and nm not in cand:
             cand.append(nm)
         if nm and trust:
@@ -163,7 +196,25 @@ def build_process_flow(text: str, items: list, scene_units: list | None = None) 
 
     # 过滤占位符/伪节点，并按“定义位置”排序（修复主链顺序与文档原序不一致）
     cand = [nm for nm in cand if not _bad_unit(nm, nm in trusted)]
-    cand.sort(key=lambda nm: _unit_pos(nm, lines_all))
+    # 注意：list.sort 排序期间原列表会被 CPython 临时清空，key 闭包必须用快照，否则读到空列表
+    cand_pool = list(cand)
+    cand.sort(key=lambda nm: _unit_pos(nm, lines_all, cand_pool))
+
+    # 同义工序名归并：核心名相同者只保留“文档中先定义”的那一个，其余记为别名（仍用于条目归属）
+    core2name, kept, alias = {}, [], {}
+    for nm in cand:
+        core = _unit_core(nm)
+        if core and core in core2name:
+            alias[nm] = core2name[core]
+            continue
+        if core:
+            core2name[core] = nm
+        kept.append(nm)
+    cand = kept
+    alias_by_node = {}
+    for _a, _k in alias.items():
+        alias_by_node.setdefault(_k, []).append(_a)
+
     truncated_nodes = len(cand) > 24
     node_names = cand[:24]
 
@@ -180,11 +231,14 @@ def build_process_flow(text: str, items: list, scene_units: list | None = None) 
     item_to_node = {}
     for nm in main_names + aux_names:
         nid = f"f{len(nodes) + 1:02d}"
-        rel = [it for it in items if _match(it, nm)]
+        nm_alias = alias_by_node.get(nm, [])
+        rel = [it for it in items
+               if _match(it, nm) or any(_match(it, a) for a in nm_alias)]
         risk = _max_severity(rel)
         desc = extract_desc(text, nm, [o for o in all_names if o != nm])
         nodes.append({
             "id": nid, "name": nm, "type": "main" if nm in main_names else "aux",
+            "aliases": nm_alias,
             "desc": desc or "（未在文档中定位到该工序的描述段，请人工补充/校核）",
             "risk": risk, "n_items": len(rel),
             "item_ids": [it["id"] for it in rel][:30],

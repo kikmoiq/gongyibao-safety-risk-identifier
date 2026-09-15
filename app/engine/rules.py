@@ -137,8 +137,12 @@ def heading_before(lines, pos, n, level_cap=6):
 
 
 # ---------- 风险场景表识别 ----------
+# 主判据：“场景类”表头词（常规工艺包）
 RISK_HEAD_KW = ["风险场景", "主要风险", "危险工况", "事故场景", "风险辨识"]
-RISK_COL_HINT = ["风险等级", "点火源", "管控", "对策", "防控", "后果", "原因"]
+# 辅判据：非常规表头（如“序号｜工房岗位｜危险源｜风险描述｜风险等级｜可能点火源｜…”）
+RISK_LEVEL_KW = ["风险等级", "风险级别", "危险等级"]
+RISK_COL_HINT = ["点火源", "管控", "对策", "防控", "后果", "原因", "措施",
+                 "危险源", "风险描述", "事故类型", "危害因素", "危险有害因素"]
 
 
 def _looks_risk_table(tb):
@@ -151,6 +155,12 @@ def _looks_risk_table(tb):
     if "机器人" in joined and any(k in joined for k in ("负责工序", "原操作人数", "机器人名称", "AGV")):
         return None
     if any(k in joined for k in RISK_HEAD_KW):
+        return head
+    # 兜底：无“风险场景”字样，但“风险等级 + 管控/点火源/后果类列”齐备，同样按风险表处理
+    # （例：起爆药线的“危险源/风险描述”式表头，此前会整表漏读）
+    if (len(head) >= 3
+            and any(k in joined for k in RISK_LEVEL_KW)
+            and any(k in joined for k in RISK_COL_HINT)):
         return head
     return None
 
@@ -222,12 +232,13 @@ def extract(text: str) -> dict:
                 col("风险等级"), col("点火源"), col("管控", "对策", "防控", "措施"),
             )
             c_impr = col("建议", "改进", "整改", "提升")
+            c_haz = col("危险源", "危险有害因素", "危害因素", "危险因素", "事故类型")
             c_unit = col("工序", "单元", "装置", "工段", "部位", "节点", "系统",
                          "区域", "工位", "岗位", "工房", "工区", "作业区", "场所", "车间")
             if c_unit is None:
                 # 列名未命中（如按“区域/岗位”组织风险表）：退而取“非 序号/场景/等级/点火源/管控/建议”的首个列
                 for _ci in range(len(head)):
-                    if _ci not in {c_seq, c_scene, c_level, c_ign, c_ctrl, c_impr}:
+                    if _ci not in {c_seq, c_scene, c_level, c_ign, c_ctrl, c_impr, c_haz}:
                         c_unit = _ci
                         break
             first_col_is_seq = c_seq == 0 or (
@@ -250,6 +261,7 @@ def extract(text: str) -> dict:
                 if unit_txt and unit_txt not in scene_units:
                     scene_units.append(unit_txt)
                 impr = (str(row[c_impr]) if c_impr is not None and c_impr < len(row) else "").strip()
+                haz = (str(row[c_haz]) if c_haz is not None and c_haz < len(row) else "").strip()
                 sev_raw = (str(row[c_level]) if c_level is not None and c_level < len(row) else "")
                 sev = SEV_KW.get(sev_raw.strip(), sev_raw.strip() or "待定")
                 ign = (str(row[c_ign]) if c_ign is not None and c_ign < len(row) else "")
@@ -272,6 +284,7 @@ def extract(text: str) -> dict:
                     recommendations=(impr if impr else "校核保护层充分性（独立 DCS/SIS、探测器、泄放、应急），确定残余风险是否可接受。"),
                     source=f"{heading_before(doc.lines, tb['start'], doc.n)[1]} · 风险场景表 第{ln}行",
                     evidence=[f"场景：{scene}", f"风险等级：{sev}" if sev else "",
+                              f"危险源：{haz}" if haz else "",
                               f"点火源：{ign}" if ign else "", f"管控：{ctrl}" if ctrl else "",
                               f"建议改进：{impr}" if impr else ""],
                     severity=sev, provenance=PROVENANCE_DOC, confidence="高",
