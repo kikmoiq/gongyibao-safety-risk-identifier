@@ -10,7 +10,7 @@
 |---|---|
 | `git` | ✅ 已安装（2.55.0，`C:\Program Files\Git\cmd\git.exe`，winget 安装） |
 | `gh`（GitHub CLI） | ✅ 已安装（2.100.0，`C:\Program Files\GitHub CLI\gh.exe`） |
-| 本目录是否 git 仓库 | ✅ 是（`main` 分支，4 次提交，最新 `5308d3a`） |
+| 本目录是否 git 仓库 | ✅ 是（`main` 分支；最新提交见仓库页） |
 | 网络 | ⚠️ github.com 直连被阻断 → 已给 git 配置本机代理 `127.0.0.1:7890`（见下） |
 | `config.json` | ⚠️ **含真实 API Key → 已加入 `.gitignore`；推送前后均核对未被跟踪** |
 
@@ -21,7 +21,7 @@
 | 仓库地址 | <https://github.com/kikmoiq/gongyibao-safety-risk-identifier> |
 | 账号 | `kikmoiq`（注意：仓库内既有提交的作者是 `talker0000`，与此账号不同名） |
 | 可见性 | **Public 公开**（如需转私有：`gh repo edit --visibility private`） |
-| 分支 / 提交 | `main` @ `5308d3a`（4 次提交） |
+| 分支 | `main`（2026-09-15 修复提交 `5308d3a`；最新提交以仓库页为准） |
 | 远端文件数 | 81（含 7 个演示工艺包与选型图） |
 | 已排除 | `config.json`、`.venv/`、`__pycache__/`（已用 API 逐项核对为空） |
 
