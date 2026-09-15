@@ -12,8 +12,11 @@ from pathlib import Path
 import httpx
 
 BASE = "http://127.0.0.1:8000"
-ROOT = Path(r"e:\桌面\工艺包")
+HERE = Path(__file__).resolve().parent          # 本系统目录
+ROOT = HERE.parent                              # 工作区根目录（工艺包 .md 通常放这里）
 OUT_ROOT = ROOT / "成果归档"
+# 工艺包查找顺序：工作区根目录 → 系统目录下的 示例数据/
+PKG_DIRS = [ROOT, HERE, HERE / "示例数据"]
 
 PKGS = [
     ("硝化棉单基发射药自动化生产线工艺包_演示示例.md", "01_自动化生产线-硝化棉单基发射药"),
@@ -120,9 +123,9 @@ def main():
             print(f"[错误] 无法连接服务 {BASE}：{e}")
             return 1
         for fn, folder in PKGS:
-            src = ROOT / fn
-            if not src.exists():
-                print(f"[跳过] 未找到：{src}")
+            src = next((d / fn for d in PKG_DIRS if (d / fn).exists()), None)
+            if src is None:
+                print(f"[跳过] 未找到工艺包：{fn}")
                 continue
             rows.append(archive(cli, src, folder, now))
 

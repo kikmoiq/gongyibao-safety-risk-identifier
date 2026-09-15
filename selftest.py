@@ -1,14 +1,28 @@
 # -*- coding: utf-8 -*-
-"""开发自测：真实己二腈文档 → 报告（流程/故障树/归属）质量检查。"""
+"""开发自测：工艺包文档 → 报告（流程/故障树/归属）质量检查。
+
+用法：
+    python selftest.py                      # 用内置演示样例
+    python selftest.py <工艺包路径.md>        # 指定工艺包
+"""
 import collections
 import sys
 import time
+from pathlib import Path
 
-sys.path.insert(0, r"e:\桌面\工艺包\安全风险辨识系统")
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+sys.path.insert(0, str(HERE))
 from app.engine import orchestrator, ingest
 
 t0 = time.time()
-default = r"e:\桌面\工艺包\硝化棉单基发射药生产工艺包_演示示例.md"
+# 默认样例查找顺序：工作区根目录 → 系统目录 示例数据/ → 内置 data/
+_CANDIDATES = [
+    ROOT / "硝化棉单基发射药生产工艺包_演示示例.md",
+    HERE / "示例数据" / "硝化棉单基发射药生产工艺包_演示示例.md",
+    HERE / "data" / "演示样例_工艺包.md",
+]
+default = next((str(p) for p in _CANDIDATES if p.exists()), str(_CANDIDATES[-1]))
 path = sys.argv[1] if len(sys.argv) > 1 else default
 text, name = ingest.read_source(path, "md")
 rpt = orchestrator.analyze(text, name, "md", False, {"llm": {}})

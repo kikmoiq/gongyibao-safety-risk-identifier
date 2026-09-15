@@ -2,7 +2,7 @@
 """把「生成的工艺包」与「对应辨识报告」分别落盘归档。
 
 用法（需先启动服务）：python archive_results.py
-输出：e:\\桌面\\工艺包\\成果归档\\<序号_名称>\\ 
+输出：<工作区根目录>\成果归档\<序号_名称>\
        ├─ 工艺包_xxx.md            （工艺包原文副本）
        ├─ 辨识报告_xxx.docx        （Word 报告）
        ├─ 辨识报告_xxx.html        （自包含 HTML，图片已内嵌，离线可读/可打印 PDF）
@@ -18,13 +18,14 @@ from pathlib import Path
 import httpx
 
 BASE = "http://127.0.0.1:8000"
-OUT_ROOT = Path(r"e:\桌面\工艺包\成果归档")
+HERE = Path(__file__).resolve().parent          # 本系统目录
+ROOT = HERE.parent
+OUT_ROOT = ROOT / "成果归档"
+PKG_DIRS = [ROOT, HERE, HERE / "示例数据"]
 
 PKGS = [
-    (r"e:\桌面\工艺包\硝化棉单基发射药自动化生产线工艺包_演示示例.md",
-     "01_自动化生产线-硝化棉单基发射药"),
-    (r"e:\桌面\工艺包\硝化棉单基发射药生产工艺包_演示示例.md",
-     "02_常规生产线-硝化棉单基发射药"),
+    ("硝化棉单基发射药自动化生产线工艺包_演示示例.md", "01_自动化生产线-硝化棉单基发射药"),
+    ("硝化棉单基发射药生产工艺包_演示示例.md", "02_常规生产线-硝化棉单基发射药"),
 ]
 
 
@@ -32,10 +33,10 @@ def main():
     OUT_ROOT.mkdir(parents=True, exist_ok=True)
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with httpx.Client(timeout=300) as cli:
-        for src, folder in PKGS:
-            p = Path(src)
-            if not p.exists():
-                print(f"[跳过] 未找到工艺包：{p}")
+        for fn, folder in PKGS:
+            p = next((d / fn for d in PKG_DIRS if (d / fn).exists()), None)
+            if p is None:
+                print(f"[跳过] 未找到工艺包：{fn}")
                 continue
             print(f"[分析] {p.name} ...")
             r = cli.post(BASE + "/api/analyze/path", json={"path": str(p)}).json()

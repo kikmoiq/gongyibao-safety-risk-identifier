@@ -65,7 +65,7 @@ gh auth login
 ## 3. 提交代码（可让我来做，也可以你自己跑）
 
 ```powershell
-Set-Location "e:\桌面\工艺包\安全风险辨识系统"
+Set-Location "<解压后的目录>\安全风险辨识系统"    # 例：e:\桌面\工艺包\安全风险辨识系统
 
 git init
 git add .
