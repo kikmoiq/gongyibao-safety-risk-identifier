@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="440" viewBox="0 0 820 440">
+  <rect width="820" height="440" fill="#ffffff" stroke="#dde3ec"/>
+  <text x="24" y="38" font-family="Microsoft YaHei" font-size="20" font-weight="bold" fill="#1f2733">AGV 运输系统 R4 选型示意（工序间转运）</text>
+  <rect x="24" y="60" width="360" height="352" rx="12" fill="#fbfcfe" stroke="#dde3ec"/>
+  <text x="44" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">运行示意</text>
+  <rect x="60" y="300" width="290" height="60" rx="10" fill="#e6f6ec" stroke="#1a7f37"/>
+  <text x="150" y="336" font-family="Microsoft YaHei" font-size="13" fill="#1a7f37">防爆 AGV 本体</text>
+  <circle cx="110" cy="372" r="14" fill="#fff" stroke="#1a7f37"/><circle cx="300" cy="372" r="14" fill="#fff" stroke="#1a7f37"/>
+  <rect x="90" y="258" width="230" height="42" rx="6" fill="#eef1f6" stroke="#6b7686"/>
+  <text x="128" y="284" font-family="Microsoft YaHei" font-size="12" fill="#44506a">湿药 / 药粒料箱</text>
+  <path d="M370 250 q40 -20 0 -60" stroke="#cf222e" stroke-width="2" fill="none"/>
+  <text x="300" y="180" font-family="Microsoft YaHei" font-size="12" fill="#cf222e">激光雷达 + 安全触边</text>
+  <rect x="70" y="120" width="120" height="40" rx="8" fill="#fff3e0" stroke="#bc4c00"/>
+  <text x="82" y="145" font-family="Microsoft YaHei" font-size="12" fill="#bc4c00">独立充电区</text>
+
+  <rect x="404" y="60" width="392" height="352" rx="12" fill="#f7f9fd" stroke="#dde3ec"/>
+  <text x="424" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">选型参数</text>
+  <g font-family="Microsoft YaHei" font-size="13.5" fill="#1f2733">
+    <text x="424" y="126">型号：AGV-EX2000（防爆型）</text>
+    <text x="424" y="154">负载：1000 kg</text>
+    <text x="424" y="182">速度：≤1.0 m/s（限速）</text>
+    <text x="424" y="210">防爆等级：Ex db IIB T4</text>
+    <text x="424" y="238">防护等级：IP65</text>
+    <text x="424" y="266">导航：激光 SLAM + 磁条冗余</text>
+    <text x="424" y="294">电池：磷酸铁锂；续航：8 h</text>
+    <text x="424" y="322">安全：防撞雷达、通信中断安全停车</text>
+    <text x="424" y="350">适用：爆炸危险区域外的工序间转运</text>
+  </g>
+</svg>

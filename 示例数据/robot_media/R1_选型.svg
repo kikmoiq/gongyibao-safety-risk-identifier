@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="440" viewBox="0 0 820 440">
+  <rect width="820" height="440" fill="#ffffff" stroke="#dde3ec"/>
+  <text x="24" y="38" font-family="Microsoft YaHei" font-size="20" font-weight="bold" fill="#1f2733">防爆机器人 R1 选型示意（硝化工序）</text>
+  <rect x="24" y="60" width="360" height="352" rx="12" fill="#fbfcfe" stroke="#dde3ec"/>
+  <text x="44" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">本体示意</text>
+  <rect x="60" y="320" width="300" height="26" rx="6" fill="#e8f0fe" stroke="#1f6feb"/>
+  <text x="150" y="338" font-family="Microsoft YaHei" font-size="12" fill="#1f6feb">防爆基座 Ex db IIB T4</text>
+  <rect x="150" y="140" width="34" height="180" rx="8" fill="#dfe8f7" stroke="#1f6feb"/>
+  <rect x="150" y="120" width="150" height="30" rx="8" fill="#e8f0fe" stroke="#1f6feb"/>
+  <circle cx="300" cy="135" r="10" fill="#fff" stroke="#1f6feb"/>
+  <text x="220" y="140" font-family="Microsoft YaHei" font-size="12" fill="#1f6feb">6 轴机械臂</text>
+  <path d="M310 135 L360 180" stroke="#1f6feb" stroke-width="3" fill="none"/>
+  <path d="M360 180 L360 230" stroke="#1f6feb" stroke-width="3" fill="none"/>
+  <rect x="344" y="230" width="32" height="26" rx="5" fill="#ffe9e9" stroke="#cf222e"/>
+  <text x="300" y="278" font-family="Microsoft YaHei" font-size="12" fill="#cf222e">末端夹持（失效保护）</text>
+  <text x="44" y="378" font-family="Microsoft YaHei" font-size="12" fill="#6b7686">用于混酸/精制棉自动投料与出料转运</text>
+
+  <rect x="404" y="60" width="392" height="352" rx="12" fill="#f7f9fd" stroke="#dde3ec"/>
+  <text x="424" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">选型参数</text>
+  <g font-family="Microsoft YaHei" font-size="13.5" fill="#1f2733">
+    <text x="424" y="126">型号：YH-Ex600（防爆型六轴）</text>
+    <text x="424" y="154">负载：20 kg（含末端夹具）</text>
+    <text x="424" y="182">重复定位精度：±0.05 mm</text>
+    <text x="424" y="210">防爆等级：Ex db IIB T4</text>
+    <text x="424" y="238">防护等级：IP65</text>
+    <text x="424" y="266">自由度：6 轴；最大速度：1.5 m/s</text>
+    <text x="424" y="294">通讯：EtherCAT（安全 PLC 联动）</text>
+    <text x="424" y="322">安全功能：急停、安全光幕、夹持失效检测</text>
+    <text x="424" y="350">安装方式：固定基座（静电接地 ≤10 Ω）</text>
+    <text x="424" y="378">适用区域：爆炸危险 1 区 / 2 区</text>
+  </g>
+</svg>

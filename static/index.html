@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工艺包安全风险辨识系统 v0.3.1（Demo）</title>
+<link rel="stylesheet" href="/static/css/style.css?v=12">
+</head>
+<body>
+
+<header id="topbar">
+  <div class="logo">🛡️ 工艺包安全风险辨识系统 <span class="badge">v0.3.1</span></div>
+  <div class="spacer"></div>
+  <button class="iconbtn" id="btnConfig">⚙️ API 配置</button>
+  <button class="iconbtn" id="btnNew" style="display:none">↩ 新分析</button>
+</header>
+
+<main id="main">
+
+  <!-- ============ 输入视图 ============ -->
+  <section id="view-input">
+    <div class="hero">
+      <h1>安全风险辨识 · 一条目一页多页报告</h1>
+      <p>本地部署 Demo · 规则引擎 + 可选大模型增强 · 支持 .md / .docx / 粘贴文本</p>
+      <div class="steps">
+        <span>① 输入工艺包</span><span>② 规则/大模型辨识</span><span>③ 条目化多页报告</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tabbtn active" data-tab="upload">上传文件（.md / .docx）</button>
+        <button class="tabbtn" data-tab="text">粘贴文本</button>
+        <button class="tabbtn" data-tab="demo">演示样例</button>
+      </div>
+
+      <div id="tab-upload">
+        <div class="dropzone" id="dropzone">
+          <div style="font-size:34px">📄</div>
+          <p style="margin:8px 0">拖拽文件到此处，或 <a href="#" id="pickFile">点击选择</a></p>
+          <p class="hint">支持 Markdown（.md）与 Word（.docx）；<b>推荐先用 docx 上传“完全不同工艺包”测试</b></p>
+          <input type="file" id="fileInput" accept=".md,.markdown,.txt,.docx">
+        </div>
+        <div id="fileMeta" style="display:none;margin-top:12px">
+          <div class="kv-content" style="background:#f0f7ff" id="fileMetaText"></div>
+        </div>
+        <div class="fieldrow">
+          <label><input type="checkbox" id="useLlmU"> 启用大模型增强（需先在 ⚙️ 配置 API）</label>
+          <div class="spacer" style="flex:1"></div>
+          <button class="primarybtn" id="btnRunUpload" disabled>开始辨识</button>
+        </div>
+      </div>
+
+      <div id="tab-text" style="display:none">
+        <textarea id="txtArea" placeholder="在此粘贴工艺包文档正文（标题、表格、安全/物料/联锁/风险场景等章节均可）…"></textarea>
+        <div class="fieldrow">
+          <input class="ghostbtn" id="txtName" placeholder="（可选）文档名称" style="flex:1;max-width:280px">
+          <label style="margin-left:auto"><input type="checkbox" id="useLlmT"> 大模型增强</label>
+          <button class="primarybtn" id="btnRunText">开始辨识</button>
+        </div>
+      </div>
+
+      <div id="tab-demo" style="display:none">
+        <p class="hint">不手动输入：直接分析 <b>本地己二腈工艺包</b>（若 config.json 中 demo_package_path 存在），快速看一遍完整演示效果。</p>
+        <div class="fieldrow">
+          <label><input type="checkbox" id="useLlmD"> 大模型增强</label>
+          <div style="flex:1"></div>
+          <button class="primarybtn" id="btnRunDemo">运行演示</button>
+        </div>
+      </div>
+
+      <div class="loading" id="loading"><span class="spin"></span><span id="loadingText">正在辨识（含表格归一化与逐行扫描）…</span></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">近期报告</h3>
+      <div id="reportList"><p class="hint">暂无。分析完成后会出现在这里（本次运行内存中）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 报告视图 ============ -->
+  <section id="view-report" style="display:none">
+    <div class="report-head">
+      <h2 id="rTitle"></h2>
+      <div class="meta" id="rMeta"></div>
+    </div>
+    <div class="modebar" id="modeBar">
+      <button class="modebtn active" data-v="overview">📊 概览（风险可视化）</button>
+      <button class="modebtn" data-v="flow">🔀 工艺流程图</button>
+      <button class="modebtn" data-v="fta">🌳 故障树 FTA</button>
+      <button class="modebtn" data-v="robot">🤖 机器人</button>
+      <button class="modebtn" data-v="ref">📚 参考文件</button>
+      <button class="modebtn" data-v="doc">📄 报告预览</button>
+      <button class="modebtn" data-v="items">🗂 条目列表</button>
+    </div>
+
+    <div class="layout" id="reportLayout">
+      <aside class="side">
+        <div class="side-top">
+          <input id="filterText" placeholder="🔍 过滤关键词…">
+          <select id="filterCategory"></select>
+          <select id="filterSeverity">
+            <option value="">严重度：全部</option>
+            <option value="极高">极高</option><option value="高">高</option>
+            <option value="中">中</option><option value="低">低</option>
+            <option value="待定">待定</option>
+          </select>
+          <select id="filterSrc">
+            <option value="">来源：全部</option>
+            <option value="doc">工艺包自带（doc）</option>
+            <option value="rule">本地规则（rule）</option>
+            <option value="llm">大模型增强（llm）</option>
+          </select>
+          <div style="margin-top:8px"><button class="ghostbtn" id="btnOverview" style="width:100%">📊 报告概览（第 0 页）</button></div>
+        </div>
+        <div class="itemlist" id="sideList"></div>
+      </aside>
+
+      <div class="panel-main">
+        <div class="pagehead">
+          <span class="crumb" id="pageCrumb"></span>
+          <div style="flex:1"></div>
+          <button class="ghostbtn" id="btnExport" title="导出整份 JSON">导出 JSON</button>
+          <button class="ghostbtn" id="btnPrint" title="打印当前页">🖨 打印</button>
+        </div>
+        <div id="pageBody"></div>
+        <div class="pager" id="pager"></div>
+      </div>
+    </div>
+
+    <!-- 工艺流程图（交互式） -->
+    <div id="flowWrap" style="display:none">
+      <div class="flownav-note" id="flowNote"></div>
+      <div class="flowcanvas" id="flowCanvas"></div>
+      <div class="fnode-detail" id="flowDetail"></div>
+    </div>
+
+    <!-- 故障树 FTA -->
+    <div id="ftaWrap" style="display:none">
+      <div class="flownav-note" id="ftaNote"></div>
+      <div class="crosspanel" id="ftaCross"></div>
+      <div class="fta-wrap"><ul class="tree" id="ftaTree"></ul></div>
+      <div class="fnode-detail" id="ftaDetail"></div>
+    </div>
+
+    <!-- 机器人（自动化装备）名录 -->
+    <div id="robotWrap" style="display:none">
+      <div class="flownav-note" id="robotNote"></div>
+      <div class="robot-layout">
+        <aside class="robot-nav" id="robotNav"></aside>
+        <div class="panel-main"><div id="robotBody"></div></div>
+      </div>
+    </div>
+
+    <!-- 参考文件 / 设计依据 -->
+    <div id="refWrap" style="display:none">
+      <div class="flownav-note" id="refNote"></div>
+      <div id="refBody"></div>
+    </div>
+
+    <!-- 可阅读报告（预览 + 下载） -->
+    <div id="docWrap" style="display:none">
+      <div class="docbar">
+        <span class="hint" id="docHint">可阅读报告（自动排版）：含概览、工艺流程图、故障树、机器人、参考文件与逐条明细；可下载 Word 或打印为 PDF。</span>
+        <div style="flex:1"></div>
+        <a class="ghostbtn" id="btnDocWord" href="#" download style="text-decoration:none">⬇ 下载 Word</a>
+        <button class="ghostbtn" id="btnDocOpen">↗ 新窗口打开</button>
+        <button class="ghostbtn" id="btnDocPrint">🖨 打印 / PDF</button>
+      </div>
+      <iframe id="docFrame" class="docframe" title="可阅读报告预览"></iframe>
+    </div>
+  </section>
+</main>
+
+<footer>本地部署 Demo · 结果仅供辨识与测试，正式安全评价请以专项分析与现行标准为准</footer>
+
+<!-- ============ API 配置弹窗 ============ -->
+<div class="modal-mask" id="cfgMask">
+  <div class="modal">
+    <div class="m-head"><span>大模型（LLM）API 配置</span><button class="ghostbtn" onclick="closeCfg()" style="border:none">✕</button></div>
+    <div class="m-body m-form">
+      <p class="hint">接口需 <b>OpenAI 兼容</b>（POST {base_url}/chat/completions）。配置后即可在分析时勾选“大模型增强”；key 留空表示保留原值。</p>
+      <label>Base URL（示例 https://api.deepseek.com/v1）</label>
+      <input id="cfgBase" placeholder="https://api.deepseek.com/v1">
+      <label>API Key</label>
+      <input id="cfgKey" type="password" placeholder="sk-…（留空=不修改）">
+      <label>模型名</label>
+      <input id="cfgModel" placeholder="deepseek-chat">
+      <label>演示数据源路径（本机工艺包 .md，可留空）</label>
+      <input id="cfgDemo" placeholder="e:\…\工艺包.md">
+    </div>
+    <div class="m-foot">
+      <button class="ghostbtn" onclick="closeCfg()">取消</button>
+      <button class="primarybtn" id="btnSaveCfg" style="margin-left:8px">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/app.js?v=12"></script>
+</body>
+</html>

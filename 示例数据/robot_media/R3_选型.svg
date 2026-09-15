@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="440" viewBox="0 0 820 440">
+  <rect width="820" height="440" fill="#ffffff" stroke="#dde3ec"/>
+  <text x="24" y="38" font-family="Microsoft YaHei" font-size="20" font-weight="bold" fill="#1f2733">辅助机械手 R3 选型示意（驱酸工序）</text>
+  <rect x="24" y="60" width="360" height="352" rx="12" fill="#fbfcfe" stroke="#dde3ec"/>
+  <text x="44" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">应用示意</text>
+  <rect x="70" y="150" width="150" height="170" rx="10" fill="#eef1f6" stroke="#6b7686"/>
+  <text x="98" y="240" font-family="Microsoft YaHei" font-size="13" fill="#44506a">离心机</text>
+  <path d="M230 200 L320 200" stroke="#1f6feb" stroke-width="4"/>
+  <rect x="300" y="180" width="70" height="40" rx="6" fill="#e8f0fe" stroke="#1f6feb"/>
+  <text x="306" y="205" font-family="Microsoft YaHei" font-size="12" fill="#1f6feb">机械手</text>
+  <text x="70" y="360" font-family="Microsoft YaHei" font-size="12" fill="#cf222e">导静电结构 / 防夹 / 门锁联锁</text>
+  <rect x="404" y="60" width="392" height="352" rx="12" fill="#f7f9fd" stroke="#dde3ec"/>
+  <text x="424" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">选型参数</text>
+  <g font-family="Microsoft YaHei" font-size="13.5" fill="#1f2733">
+    <text x="424" y="126">型号：MH-Ex120（防爆机械手）</text>
+    <text x="424" y="154">负载：120 kg</text>
+    <text x="424" y="182">重复定位精度：±0.1 mm</text>
+    <text x="424" y="210">防护等级：IP65</text>
+    <text x="424" y="238">防爆等级：Ex ib IIB T4</text>
+    <text x="424" y="266">安全：导静电、防夹、限速</text>
+    <text x="424" y="294">联锁：与离心机门锁/转速联锁</text>
+    <text x="424" y="322">适用：离心机进出料与取样</text>
+  </g>
+</svg>

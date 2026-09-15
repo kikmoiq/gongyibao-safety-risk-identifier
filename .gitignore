@@ -1,0 +1,35 @@
+# ==========================================================
+#  .gitignore —— 工艺包安全风险辨识系统
+#  重要：config.json 内含真实 API Key，绝对禁止提交/上传
+# ==========================================================
+
+# ---- 敏感配置（务必排除）----
+config.json
+config.local.json
+*.key
+.env
+
+# ---- Python 虚拟环境与缓存 ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ---- 运行产物 / 归档 ----
+发布/
+*.zip
+logs/
+*.log
+data/reports/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

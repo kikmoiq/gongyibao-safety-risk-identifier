@@ -1,0 +1,12 @@
+{
+  "llm": {
+    "enabled": false,
+    "base_url": "https://api.deepseek.com/v1",
+    "api_key": "",
+    "model": "deepseek-chat",
+    "temperature": 0.2,
+    "max_tokens": 4096,
+    "max_excerpt_chars": 12000
+  },
+  "demo_package_path": "e:\\桌面\\工艺包\\丁二烯直接氢化法制己二腈工艺包.md"
+}

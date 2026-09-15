@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="440" viewBox="0 0 820 440">
+  <rect width="820" height="440" fill="#ffffff" stroke="#dde3ec"/>
+  <text x="24" y="38" font-family="Microsoft YaHei" font-size="20" font-weight="bold" fill="#1f2733">桁架机器人 R2 选型示意（捏合塑化工序）</text>
+  <rect x="24" y="60" width="360" height="352" rx="12" fill="#fbfcfe" stroke="#dde3ec"/>
+  <text x="44" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">结构示意</text>
+  <rect x="50" y="110" width="300" height="14" fill="#e8f0fe" stroke="#1f6feb"/>
+  <rect x="50" y="360" width="300" height="14" fill="#e8f0fe" stroke="#1f6feb"/>
+  <rect x="70" y="110" width="12" height="264" fill="#e8f0fe" stroke="#1f6feb"/>
+  <rect x="318" y="110" width="12" height="264" fill="#e8f0fe" stroke="#1f6feb"/>
+  <rect x="150" y="124" width="90" height="40" rx="8" fill="#fff3e0" stroke="#bc4c00"/>
+  <text x="160" y="149" font-family="Microsoft YaHei" font-size="12" fill="#bc4c00">横梁小车</text>
+  <path d="M195 164 L195 250" stroke="#bc4c00" stroke-width="3"/>
+  <rect x="165" y="250" width="60" height="34" rx="6" fill="#fff3e0" stroke="#bc4c00"/>
+  <text x="172" y="272" font-family="Microsoft YaHei" font-size="12" fill="#bc4c00">夹具/模具</text>
+  <rect x="150" y="300" width="90" height="46" rx="8" fill="#eef1f6" stroke="#6b7686"/>
+  <text x="152" y="330" font-family="Microsoft YaHei" font-size="12" fill="#44506a">捏合机料口</text>
+  <text x="44" y="392" font-family="Microsoft YaHei" font-size="12" fill="#cf222e">安全光幕 / 限位与防坠保护</text>
+
+  <rect x="404" y="60" width="392" height="352" rx="12" fill="#f7f9fd" stroke="#dde3ec"/>
+  <text x="424" y="92" font-family="Microsoft YaHei" font-size="14" fill="#6b7686">选型参数</text>
+  <g font-family="Microsoft YaHei" font-size="13.5" fill="#1f2733">
+    <text x="424" y="126">型号：GT-3200（重载桁架）</text>
+    <text x="424" y="154">负载：300 kg</text>
+    <text x="424" y="182">重复定位精度：±0.1 mm</text>
+    <text x="424" y="210">自由度：3 轴（X/Y/Z）</text>
+    <text x="424" y="238">防护等级：IP54；速度：1.2 m/s</text>
+    <text x="424" y="266">安全功能：限位、防坠、安全光幕</text>
+    <text x="424" y="294">控制：安全 PLC + MES 联动</text>
+    <text x="424" y="322">适用：高温高粘药料上下料</text>
+    <text x="424" y="350">人机协同：安全距离与联锁停机</text>
+  </g>
+</svg>
